@@ -1,0 +1,86 @@
+{
+  "festival": false,
+  "schedule": [
+    {
+      "datetime_begin": "2016-01-11T11:00:00.000+09:00",
+      "datetime_end": "2016-01-11T15:00:00.000+09:00",
+      "stages": {
+        "regular": [
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/75113647a9572411e417d9adaaf243fa09aaf895e416e5af258281d8471a3cae-6f9d3d3577455192359dbed07fd415a1d074d3acdb81f52c268bc6e2b3c9ec45.png",
+            "name": "Walleye Warehouse"
+          },
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/d82e60322bd05b555163aac0f57989dcbf16835e8ba980a11ccaa1c2fa57d96b-cd05dddfa0d5b900d362980ec084406c7f000d2c3f3f1de79e6c1c6c5c593b63.png",
+            "name": "Blackbelly Skatepark"
+          }
+        ],
+        "gachi": [
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/91875946094b3ad30b54023866ccc57695e3ab194e989c1d2e1153adee2f0cd9-a192af65e4c4f8dd292a1cbe8f3af617cf140c034001a6d8579d104ff3fa9b9c.png",
+            "name": "Kelp Dome"
+          },
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/b3f7046015aff41ca5934ae769f80c0a60a1b0a28593243698d857b5603a5943-bd4ec6b1343c542bb31b483d14b243e24ae05a9707fd80d56739748f6ac283b8.png",
+            "name": "Mahi-Mahi Resort"
+          }
+        ]
+      },
+      "gachi_rule": "Tower Control"
+    },
+    {
+      "datetime_begin": "2016-01-11T15:00:00.000+09:00",
+      "datetime_end": "2016-01-11T19:00:00.000+09:00",
+      "stages": {
+        "regular": [
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/29d337c67ca79145136cf3e3d4ed754c755f097df2375db3c172eb87663a5561-992bb99b095e4f2750f14c1b5e8c2c7f1230ec592ee3c8ba0134fde2d27370f2.png",
+            "name": "Saltspray Rig"
+          },
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/f06b270aa48037bd1dc9afb8fda4f325d88a7d6d62def406982622b6a90fdce0-ac247ee90d975411373f6005637dab83c2b141e4904d428c747858a6e858ff18.png",
+            "name": "Moray Towers"
+          }
+        ],
+        "gachi": [
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/75113647a9572411e417d9adaaf243fa09aaf895e416e5af258281d8471a3cae-6f9d3d3577455192359dbed07fd415a1d074d3acdb81f52c268bc6e2b3c9ec45.png",
+            "name": "Walleye Warehouse"
+          },
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/8efc20f6687ad2c0be1dbbc4fac26a5f2799025310f54006069c2ecb3aa11f5e-9f545f8dd9d2c64e2db9fbde66deca6c2a764d608a8b0466d212fc62b75e5e5c.png",
+            "name": "Camp Triggerfish"
+          }
+        ]
+      },
+      "gachi_rule": "Splat Zones"
+    },
+    {
+      "datetime_begin": "2016-01-11T19:00:00.000+09:00",
+      "datetime_end": "2016-01-11T23:00:00.000+09:00",
+      "stages": {
+        "regular": [
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/c1775c19c1d84b0ca8b49f2d97815406c0dfd902cf9eec5d91bc7379395a852c-408f9ed32cc2a468ddb7469e740c511e0c2867dfadc2fb84d1b21f52b2758f03.png",
+            "name": "Flounder Heights"
+          },
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/b3f7046015aff41ca5934ae769f80c0a60a1b0a28593243698d857b5603a5943-bd4ec6b1343c542bb31b483d14b243e24ae05a9707fd80d56739748f6ac283b8.png",
+            "name": "Mahi-Mahi Resort"
+          }
+        ],
+        "gachi": [
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/f06b270aa48037bd1dc9afb8fda4f325d88a7d6d62def406982622b6a90fdce0-ac247ee90d975411373f6005637dab83c2b141e4904d428c747858a6e858ff18.png",
+            "name": "Moray Towers"
+          },
+          {
+            "asset_path": "\/assets\/en\/svg\/stage\/@2x\/838e35bab8072c74c4dfd55df59f028d302ae7636469eeb816a4dd27cbab9ab0-15cea2bf76cc15acaf04ffc0a9dedc206f966c669d362b552825273da5952270.png",
+            "name": "Piranha Pit"
+          }
+        ]
+      },
+      "gachi_rule": "Rainmaker"
+    }
+  ]
+}
