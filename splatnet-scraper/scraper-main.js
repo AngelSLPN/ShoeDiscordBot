@@ -5,7 +5,7 @@ var request = require('request').defaults({jar: true}),
 var fs = require('fs');
 
 function SplatnetScraper() {
-
+  this.schedule = [];
 }
 
 SplatnetScraper.prototype.login = function(callback) {
@@ -28,6 +28,23 @@ SplatnetScraper.prototype.login = function(callback) {
 };
 
 SplatnetScraper.prototype.getSchedule = function(callback) {
+  if (this.scheduleValid(Date.now())) {
+    callback(null, this.getScheduleAsMessage(this.schedule));
+  } else {
+    this.pollSchedule(callback);
+  }
+};
+
+SplatnetScraper.prototype.scheduleValid = function(currentTime) {
+  if (this.schedule.length == 0) {
+    return false;
+  }
+  var beginTime = (new Date(this.schedule[0].begin)).getTime();
+  var endTime = (new Date(this.schedule[0].end)).getTime();
+  return (currentTime >= beginTime && currentTime < endTime);
+};
+
+SplatnetScraper.prototype.pollSchedule = function(callback) {
   //need to get html before json or get an error
   var uriHtml = 'https://splatoon.nintendo.net/schedule';
   var uriJson = 'https://splatoon.nintendo.net/schedule/index.json?locale=en';
@@ -54,6 +71,7 @@ SplatnetScraper.prototype.getSchedule = function(callback) {
           }
 
           var jsonSchedule = this.parseScheduleJson(rawSchedule);
+          this.schedule = jsonSchedule;
           var messageSchedule = this.getScheduleAsMessage(jsonSchedule);
           callback?callback(null, messageSchedule):null;
 
@@ -65,11 +83,12 @@ SplatnetScraper.prototype.getSchedule = function(callback) {
 };
 
 SplatnetScraper.prototype.parseScheduleJson = function(rawSchedule) {
-  console.log(rawSchedule.schedule);
+  //console.log(rawSchedule.schedule);
   if (!rawSchedule.festival) {
     var schedule = rawSchedule.schedule.map(function(obj) {
       return {
         begin: obj.datetime_begin,
+        end: obj.datetime_end,
         turfMaps: [obj.stages.regular[0].name, obj.stages.regular[1].name],
         rankedMode: obj.gachi_rule,
         rankedMaps: [obj.stages.gachi[0].name, obj.stages.gachi[1].name],

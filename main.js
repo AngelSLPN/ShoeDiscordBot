@@ -3,7 +3,8 @@ var Discord = require('discord.js'),
     auth = require('./auth.json'),
     SplatnetScraper = require('./splatnet-scraper/scraper-main');
 
-var mybot = new Discord.Client();
+var mybot = new Discord.Client(),
+    splatnet = new SplatnetScraper();
 
 //when the bot is ready
 mybot.on("ready", function () {
@@ -23,8 +24,8 @@ mybot.on('message', function(message) {
   if (message.content === 'ping') {
     mybot.reply(message, 'pong');
   }
-  if (message.content === '<<schedule') {
-    var splatnet = new SplatnetScraper();
+  if (message.content === '%schedule') {
+
     async.series([
       splatnet.login,
       splatnet.getSchedule.bind(splatnet),
