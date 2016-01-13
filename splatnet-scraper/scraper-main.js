@@ -101,20 +101,12 @@ SplatnetScraper.prototype.parseScheduleJson = function(rawSchedule) {
 
 SplatnetScraper.prototype.getScheduleAsMessage = function(jsonSchedule) {
   var message = '';
-
-  var modeDict = {
-    Turf: 'T: ',
-    'Splat Zones': 'SZ: ',
-    'Tower Control': 'TC: ',
-    'Rainmaker': 'RM: ',
-  };
-
   for (var i=0; i < jsonSchedule.length; i++) {
     var timeString = this.getTimeString(jsonSchedule[i].begin);
 
     message += '**' + timeString + '** \n' +
-      modeDict['Turf'] + jsonSchedule[i].turfMaps[0] + jsonSchedule[i].turfMaps[1] + '\n' +
-      modeDict[jsonSchedule[i].rankedMode] + jsonSchedule[i].rankedMaps[0] + ' & ' + jsonSchedule[i].rankedMaps[1] + '\n';
+      'Turf on '  + jsonSchedule[i].turfMaps[0] + ' and ' + jsonSchedule[i].turfMaps[1] + '\n' +
+      jsonSchedule[i].rankedMode + ' on ' + jsonSchedule[i].rankedMaps[0] + ' and ' + jsonSchedule[i].rankedMaps[1] + '\n';
   }
   return message;
 };
