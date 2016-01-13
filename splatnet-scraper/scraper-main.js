@@ -93,7 +93,7 @@ SplatnetScraper.prototype.parseScheduleJson = function(rawSchedule) {
         rankedMode: obj.gachi_rule,
         rankedMaps: [obj.stages.gachi[0].name, obj.stages.gachi[1].name],
       };
-    })
+    });
   }
 
   return schedule;
