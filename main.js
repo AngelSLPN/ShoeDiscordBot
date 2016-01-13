@@ -1,67 +1,8 @@
 var Discord = require('discord.js'),
-    async = require('async'),
     auth = require('./auth.json'),
-    SplatnetScraper = require('./splatnet-scraper/scraper-main');
+    commands = require('./commands');
 
-var mybot = new Discord.Client(),
-    splatnet = new SplatnetScraper();
-
-var commands = {
-  help: {
-    cooldown: 0,
-    help: 'call this command to get help',
-    script: function(message, args) {
-      if (args[0]) {
-        mybot.sendMessage(message.channel, commands[args[0]].help);
-      } else {
-        //list commands
-        mybot.sendMessage(message.channel, Object.keys(commands).toString());
-      }
-    },
-  },
-  servers: {
-    cooldown: 600,
-    help: 'a list of servers this bot is in',
-    script: function(message, args) {
-      mybot.sendMessage(message.channel, mybot.servers);
-    },
-  },
-  channels: {
-    cooldown: 600,
-    help: 'a list of channels this bot is in',
-    script: function(message, args) {
-      mybot.sendMessage(message.channel, mybot.channels);
-    },
-  },
-  schedule: {
-    cooldown: 600,
-    help: 'upcoming map rotations in splatoon',
-    script: function(message, args) {
-      async.series([
-        splatnet.login,
-        splatnet.getSchedule.bind(splatnet),
-      ], function(err, results) {
-        if (results) {
-          mybot.sendMessage(message.channel, results[1]);
-        }
-      });
-    },
-  },
-  ranked: {
-    cooldown: 600,
-    help: 'test command to get ranks',
-    script: function(message, args) {
-      async.series([
-        splatnet.login,
-        splatnet.getRanked.bind(splatnet),
-      ], function(err, results) {
-        /*if (results) {
-          mybot.sendMessage(message.channel, results[1]);
-        }*/
-      });
-    },
-  },
-}
+var mybot = new Discord.Client();
 
 //when the bot is ready
 mybot.on("ready", function () {
@@ -79,21 +20,13 @@ mybot.on("disconnected", function () {
 
 mybot.on('message', function(message) {
   if (message.content.startsWith('%')) {
-    var parsed = parseCommand(message.content);
-    if (commands.hasOwnProperty(parsed.command)) {
-      commands[parsed.command].script(message, parsed.arguments);
+    var parsed = commands.parse(message.content);
+    if (commands.list.hasOwnProperty(parsed.command)) {
+      commands.list[parsed.command].script(mybot, message, parsed.arguments);
     } else {
-      mybot.sendMessage(message.channel, command + ' command not supported');
+      mybot.sendMessage(message.channel, '"' + parsed.command + '" command not supported');
     }
   }
 });
-
-function parseCommand(messageContent) {
-  var args = messageContent.slice(1).split(' ');
-  return {
-    command: args[0],
-    arguments: args.slice(1),
-  }
-}
 
 mybot.login(auth.discord.email, auth.discord.password);
