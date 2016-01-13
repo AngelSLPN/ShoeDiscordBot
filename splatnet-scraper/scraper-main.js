@@ -44,46 +44,46 @@ SplatnetScraper.prototype.scheduleValid = function(currentTime) {
   return (currentTime >= beginTime && currentTime < endTime);
 };
 
-SplatnetScraper.prototype.pollSchedule = function(callback) {
-  //need to get html before json or get an error
-  var uriHtml = 'https://splatoon.nintendo.net/schedule';
-  var uriJson = 'https://splatoon.nintendo.net/schedule/index.json?locale=en';
-  request(
-    uriHtml,
-    function(err, res, body) {
+SplatnetScraper.prototype.poll = function(options) {
+  request(options.uriHtml, function(err, res, body) {
+    if (err) {
+      console.error('get ' + options.uriHtml + ' failed');
+      return;
+    }
+
+    request(options.uriJson, function(err, res, body) {
       if (err) {
-        console.error('get ' + uriHtml + ' failed');
+        console.error('get ' + options.uriJson + ' failed');
         return;
       }
 
-      request(
-        uriJson,
-        function(err, res, body) {
-          if (err) {
-            console.error('get ' + uriHtml + ' failed');
-            return;
-          }
+      var result = options.parseFunction(body);
 
-          var rawSchedule = JSON.parse(body);
-          if (rawSchedule.error) {
-            console.error('get ' + urijson + ' failed');
-            return;
-          }
+      options.callback?options.callback(null, result):null;
+    }.bind(this));
+  }.bind(this));
+};
 
-          var jsonSchedule = this.parseScheduleJson(rawSchedule);
-          this.schedule = jsonSchedule;
-          var messageSchedule = this.getScheduleAsMessage(jsonSchedule);
-          callback?callback(null, messageSchedule):null;
+SplatnetScraper.prototype.pollSchedule = function(callback) {
+  this.poll({
+    uriHtml: 'https://splatoon.nintendo.net/schedule',
+    uriJson: 'https://splatoon.nintendo.net/schedule/index.json?locale=en',
+    callback: callback,
+    parseFunction: function(body) {
+      var rawSchedule = JSON.parse(body);
+      if (rawSchedule.error) {
+        console.error('get ' + urijson + ' failed');
+        return;
+      }
 
-          //console.log(schedule);
-        }.bind(this)
-      )
-    }.bind(this)
-  );
+      var jsonSchedule = this.parseScheduleJson(rawSchedule);
+      this.schedule = jsonSchedule;
+      return this.getScheduleAsMessage(jsonSchedule);
+    }.bind(this),
+  });
 };
 
 SplatnetScraper.prototype.parseScheduleJson = function(rawSchedule) {
-  //console.log(rawSchedule.schedule);
   if (!rawSchedule.festival) {
     var schedule = rawSchedule.schedule.map(function(obj) {
       return {
@@ -128,27 +128,21 @@ SplatnetScraper.prototype.getTimeString = function(time) {
 };
 
 SplatnetScraper.prototype.getRanked = function(callback) {
-  var uri = 'https://splatoon.nintendo.net/ranking?locale=en';
-  request(
-    uri,
-    function(err, res, body) {
-      if (err) {
-        console.error('get ' + uri + ' failed');
-        return;
-      }
+  this.poll({
+    uriHtml: 'https://splatoon.nintendo.net/ranking?locale=en',
+    uriJson: 'https://splatoon.nintendo.net/ranking/index.json?locale=en',
+    callback: callback,
+    parseFunction: function(body) {
 
-      //var schedule = this.parseScheduleHtml(body);
       fs.writeFile('./test.txt', body, function(err) {
         if (err) {
           return console.log(err);
         }
+        console.log('gotten');
       });
-
-      callback?callback(null, schedule):null
-
-      //sconsole.log(schedule);
-    }.bind(this)
-  );
+      return;
+    }.bind(this),
+  });
 };
 
 module.exports = SplatnetScraper;
