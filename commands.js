@@ -1,6 +1,24 @@
 var SplatnetScraper = require('./splatnet-scraper/scraper-main'),
     async = require('async');
 var splatnet = new SplatnetScraper();
+
+var server = {
+  default: {
+    cooldown: 600,
+    help: '',
+    script: function(bot, message, args) {
+      bot.sendMessage(message.channel, 'server.default stub');
+    },
+  },
+  owner: {
+    cooldown: 600,
+    help: '',
+    script: function(bot, message, args) {
+      bot.sendMessage(message.channel, message.channel.server.owner);
+    },
+  },
+}
+
 var commands = {
   list: {
     help: {
@@ -20,6 +38,17 @@ var commands = {
       help: 'a list of servers this bot is in',
       script: function(bot, message, args) {
         bot.sendMessage(message.channel, bot.servers);
+      },
+    },
+    server: {
+      cooldown: 600,
+      help: 'server specific commands',
+      script: function(bot, message, args) {
+        if (args[0]) {
+          server[args[0]].script(bot, message, args);
+        } else {
+          server.default.script(bot, message, args);
+        }
       },
     },
     channels: {
@@ -68,7 +97,7 @@ var commands = {
   parse: function parseCommand(messageContent) {
     var args = messageContent.slice(1).split(' ');
     return {
-      command: args[0],
+      command: args[0].toLowerCase(),
       arguments: args.slice(1),
     }
   },
