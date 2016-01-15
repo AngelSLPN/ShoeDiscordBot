@@ -1,4 +1,4 @@
-var SplatnetScraper = require('./splatnet-scraper/scraper-main'),
+var SplatnetScraper = require('./splatoon/scraper-main'),
     async = require('async');
 var splatnet = new SplatnetScraper();
 
@@ -90,7 +90,7 @@ var commands = {
       cooldown: 600,
       help: 'what a selky is',
       script: function(bot, message, args) {
-        bot.sendMessage(message.channel, 'ìßully');
+        bot.sendMessage(message.channel, 'Giant');
       },
     }
   },
