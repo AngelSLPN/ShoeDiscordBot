@@ -17,7 +17,7 @@ var server = {
       bot.sendMessage(message.channel, message.channel.server.owner);
     },
   },
-}
+};
 
 var commands = {
   list: {
@@ -62,14 +62,23 @@ var commands = {
       cooldown: 600,
       help: 'upcoming map rotations in splatoon',
       script: function(bot, message, args) {
-        async.series([
-          splatnet.login,
-          splatnet.getSchedule.bind(splatnet),
-        ], function(err, results) {
-          if (results) {
-            bot.sendMessage(message.channel, results[1]);
+        var functions = [];
+        if (splatnet.scheduleValid()) {
+          functions = [splatnet.getSchedule.bind(splatnet)];
+        } else {
+          functions = [
+            splatnet.login,
+            splatnet.getSchedule.bind(splatnet)
+          ];
+        }
+        async.series(
+          functions,
+          function(err, results) {
+            if (results) {
+              bot.sendMessage(message.channel, results[1]);
+            }
           }
-        });
+        );
       },
     },
     ranked: {
@@ -92,6 +101,20 @@ var commands = {
       script: function(bot, message, args) {
         bot.sendMessage(message.channel, 'Giant');
       },
+    },
+    invite: {
+      cooldown: 600,
+      help: 'make the bot join another discord server',
+      script: function(bot, message, args) {
+        console.log('got invite to ' + args[0]);
+        bot.joinServer(args[0], function(error, server) {
+          if(error){
+              bot.sendMessage(message.channel, "Failed to join: " + error);
+          } else {
+              bot.sendMessage(message.channel, "Joined " + server);
+          }
+        });
+      }
     }
   },
   parse: function parseCommand(messageContent) {
@@ -101,6 +124,6 @@ var commands = {
       arguments: args.slice(1),
     }
   },
-}
+};
 
 module.exports = commands;
