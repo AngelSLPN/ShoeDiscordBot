@@ -97,11 +97,11 @@ SplatnetScraper.prototype.parseScheduleJson = function(rawSchedule) {
     });
   } else {
     schedule = [{
-      begin: obj.schedule[0].datetime_begin,
-      end: obj.schedule[0].datetime_end,
-      alpha: obj.schedule[0].team_alpha,
-      bravo: obj.schedule[0].team_bravo,
-      splatfestMaps: obj.schedule[0].stages.map(function(stage) {return stage.name;}),
+      begin: rawSchedule.schedule[0].datetime_begin,
+      end: rawSchedule.schedule[0].datetime_end,
+      alpha: rawSchedule.schedule[0].team_alpha_name,
+      bravo: rawSchedule.schedule[0].team_bravo_name,
+      splatfestMaps: rawSchedule.schedule[0].stages.map(function(stage) {return stage.name;}),
     }];
   }
 
@@ -114,14 +114,14 @@ SplatnetScraper.prototype.getScheduleAsMessage = function(jsonSchedule) {
     var timeString = this.getTimeString(jsonSchedule[i].begin);
 
     message += '**' + timeString + '** \n'
-    if (jsonSchedule[i.turfMaps]) {
+    if (jsonSchedule[i].turfMaps) {
       message += 'Turf on '  + jsonSchedule[i].turfMaps[0] + ' and ' + jsonSchedule[i].turfMaps[1] + '\n';
     }
-    if (jsonSchedule[i].rankedMaps]) {
+    if (jsonSchedule[i].rankedMaps) {
       message += jsonSchedule[i].rankedMode + ' on ' + jsonSchedule[i].rankedMaps[0] + ' and ' + jsonSchedule[i].rankedMaps[1] + '\n';
     }
     if (jsonSchedule[i].splatfestMaps) {
-      message += jsonSchedule[i].team_alpha + ' vs ' + jsonSchedul[i].team_bravo + ' on ' + jsonSchedule[i].splatfestMaps[0] + ', ';
+      message += jsonSchedule[i].alpha + ' vs ' + jsonSchedule[i].bravo + ' on ' + jsonSchedule[i].splatfestMaps[0] + ', ';
       message += jsonSchedule[i].splatfestMaps[1] + ', and ' + jsonSchedule[i].splatfestMaps[2];
     }
 
