@@ -84,8 +84,9 @@ SplatnetScraper.prototype.pollSchedule = function(callback) {
 };
 
 SplatnetScraper.prototype.parseScheduleJson = function(rawSchedule) {
+  var schedule;
   if (!rawSchedule.festival) {
-    var schedule = rawSchedule.schedule.map(function(obj) {
+    schedule = rawSchedule.schedule.map(function(obj) {
       return {
         begin: obj.datetime_begin,
         end: obj.datetime_end,
@@ -94,6 +95,14 @@ SplatnetScraper.prototype.parseScheduleJson = function(rawSchedule) {
         rankedMaps: [obj.stages.gachi[0].name, obj.stages.gachi[1].name],
       };
     });
+  } else {
+    schedule = [{
+      begin: obj.schedule[0].datetime_begin,
+      end: obj.schedule[0].datetime_end,
+      alpha: obj.schedule[0].team_alpha,
+      bravo: obj.schedule[0].team_bravo,
+      splatfestMaps: obj.schedule[0].stages.map(function(stage) {return stage.name;}),
+    }];
   }
 
   return schedule;
@@ -104,9 +113,18 @@ SplatnetScraper.prototype.getScheduleAsMessage = function(jsonSchedule) {
   for (var i=0; i < jsonSchedule.length; i++) {
     var timeString = this.getTimeString(jsonSchedule[i].begin);
 
-    message += '**' + timeString + '** \n' +
-      'Turf on '  + jsonSchedule[i].turfMaps[0] + ' and ' + jsonSchedule[i].turfMaps[1] + '\n' +
-      jsonSchedule[i].rankedMode + ' on ' + jsonSchedule[i].rankedMaps[0] + ' and ' + jsonSchedule[i].rankedMaps[1] + '\n';
+    message += '**' + timeString + '** \n'
+    if (jsonSchedule[i.turfMaps]) {
+      message += 'Turf on '  + jsonSchedule[i].turfMaps[0] + ' and ' + jsonSchedule[i].turfMaps[1] + '\n';
+    }
+    if (jsonSchedule[i].rankedMaps]) {
+      message += jsonSchedule[i].rankedMode + ' on ' + jsonSchedule[i].rankedMaps[0] + ' and ' + jsonSchedule[i].rankedMaps[1] + '\n';
+    }
+    if (jsonSchedule[i].splatfestMaps) {
+      message += jsonSchedule[i].team_alpha + ' vs ' + jsonSchedul[i].team_bravo + ' on ' + jsonSchedule[i].splatfestMaps[0] + ', ';
+      message += jsonSchedule[i].splatfestMaps[1] + ', and ' + jsonSchedule[i].splatfestMaps[2];
+    }
+
   }
   return message;
 };
