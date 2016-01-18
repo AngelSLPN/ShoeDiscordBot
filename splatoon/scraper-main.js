@@ -1,7 +1,9 @@
 var request = require('request').defaults({jar: true}),
     //cheerio = require('cheerio'),
-    credentials = require('../auth.json');
+    credentials = require('../auth.json'),
+    ScheduleEntry = require('./schedule-entry-model');
 
+//for prototyping
 var fs = require('fs');
 
 function SplatnetScraper() {
@@ -39,9 +41,9 @@ SplatnetScraper.prototype.scheduleValid = function(currentTime) {
   if (this.schedule.length == 0) {
     return false;
   }
-  var beginTime = (new Date(this.schedule[0].begin)).getTime();
-  var endTime = (new Date(this.schedule[0].end)).getTime();
-  return (currentTime >= beginTime && currentTime < endTime);
+  var afterBeginTime = currentTime >= this.schedule[0].begin.getTime();
+  var beforeEndTime = currentTime < this.schedule[0].end.getTime();
+  return (afterBeginTime && beforeEndTime);
 };
 
 SplatnetScraper.prototype.poll = function(options) {
@@ -78,9 +80,28 @@ SplatnetScraper.prototype.pollSchedule = function(callback) {
 
       var jsonSchedule = this.parseScheduleJson(rawSchedule);
       this.schedule = jsonSchedule;
+      this.saveScheduleToDb(jsonSchedule);
       return this.getScheduleAsMessage(jsonSchedule);
     }.bind(this),
   });
+};
+
+SplatnetScraper.prototype.saveScheduleToDb = function(schedule) {
+  for (var i=0; i < schedule.length; i++) {
+    ScheduleEntry.findOne({'begin': schedule[i].begin})
+    .select('begin end')
+    .exec(function(err, doc) {
+      if (err) {
+        return console.log(err);
+      }
+      if (!doc) {
+        var model = new ScheduleEntry(this);
+        model.save(function(err, entry) {
+          if (err) return console.error(err);
+        });
+      }
+    }.bind(schedule[i]));
+  }
 };
 
 SplatnetScraper.prototype.parseScheduleJson = function(rawSchedule) {
@@ -88,8 +109,8 @@ SplatnetScraper.prototype.parseScheduleJson = function(rawSchedule) {
   if (!rawSchedule.festival) {
     schedule = rawSchedule.schedule.map(function(obj) {
       return {
-        begin: obj.datetime_begin,
-        end: obj.datetime_end,
+        begin: new Date(obj.datetime_begin),
+        end: new Date(obj.datetime_end),
         turfMaps: [obj.stages.regular[0].name, obj.stages.regular[1].name],
         rankedMode: obj.gachi_rule,
         rankedMaps: [obj.stages.gachi[0].name, obj.stages.gachi[1].name],
@@ -97,8 +118,8 @@ SplatnetScraper.prototype.parseScheduleJson = function(rawSchedule) {
     });
   } else {
     schedule = [{
-      begin: rawSchedule.schedule[0].datetime_begin,
-      end: rawSchedule.schedule[0].datetime_end,
+      begin: new Date(rawSchedule.schedule[0].datetime_begin),
+      end: new Date(rawSchedule.schedule[0].datetime_end),
       alpha: rawSchedule.schedule[0].team_alpha_name,
       bravo: rawSchedule.schedule[0].team_bravo_name,
       splatfestMaps: rawSchedule.schedule[0].stages.map(function(stage) {return stage.name;}),
@@ -124,14 +145,12 @@ SplatnetScraper.prototype.getScheduleAsMessage = function(jsonSchedule) {
       message += jsonSchedule[i].alpha + ' vs ' + jsonSchedule[i].bravo + ' on ' + jsonSchedule[i].splatfestMaps[0] + ', ';
       message += jsonSchedule[i].splatfestMaps[1] + ', and ' + jsonSchedule[i].splatfestMaps[2];
     }
-
   }
   return message;
 };
 
 SplatnetScraper.prototype.getTimeString = function(time) {
-  var beginTime = new Date(time);
-  var difference = beginTime.getTime() - Date.now();
+  var difference = time.getTime() - Date.now();
   var resultInMin = Math.round(difference / 60000);
   var timeString = ''
   if (resultInMin < 0) {
@@ -139,12 +158,19 @@ SplatnetScraper.prototype.getTimeString = function(time) {
   } else {
     var hour = Math.floor(resultInMin / 60);
     var minutes =  resultInMin % 60;
-    timeString = 'In ' + hour + ' hours ' + minutes + ' minutes';
+    timeString = 'In ';
+
+    if (hour > 0) {
+      timeString += hour + ' hour';
+      timeString += (hour > 1)?'s ':' ';
+    }
+    timeString += minutes + ' minutes';
   }
 
   return timeString;
 };
-
+/*
+//get and record ranked list
 SplatnetScraper.prototype.getRanked = function(callback) {
   this.poll({
     uriHtml: 'https://splatoon.nintendo.net/ranking?locale=en',
@@ -161,6 +187,6 @@ SplatnetScraper.prototype.getRanked = function(callback) {
       return;
     }.bind(this),
   });
-};
+};*/
 
 module.exports = SplatnetScraper;

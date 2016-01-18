@@ -1,6 +1,8 @@
 var Discord = require('discord.js'),
     auth = require('./auth.json'),
-    commands = require('./commands');
+    commands = require('./commands'),
+    settings = require('./settings.json'),
+    db = require('./db');
 
 var mybot = new Discord.Client();
 
@@ -19,7 +21,7 @@ mybot.on("disconnected", function () {
 });
 
 mybot.on('message', function(message) {
-  if (message.content.startsWith('%')) {
+  if (message.content.startsWith(settings.prefix)) {
     var parsed = commands.parse(message.content);
     if (commands.list.hasOwnProperty(parsed.command)) {
       commands.list[parsed.command].script(mybot, message, parsed.arguments);

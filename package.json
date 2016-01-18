@@ -1,14 +1,14 @@
 {
-  "name": "ib-discord-bot",
+  "name": "shoe-discord-bot",
   "version": "1.0.0",
-  "description": "Discord Bot for ib gaming",
+  "description": "Discord Bot for with focus on Splatoon community",
   "main": "main.js",
   "scripts": {
     "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hymm/iBDiscordBot.git"
+    "url": "git+https://github.com/hymm/ShoeDiscordBot.git"
   },
   "keywords": [
     "discord",
@@ -17,9 +17,9 @@
   "author": "Mike Hsu",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hymm/iBDiscordBot/issues"
+    "url": "https://github.com/hymm/ShoeDiscordBot/issues"
   },
-  "homepage": "https://github.com/hymm/iBDiscordBot#readme",
+  "homepage": "https://github.com/hymm/ShoeDiscordBot#readme",
   "dependencies": {
     "async": "^1.5.2",
     "cheerio": "^0.19.0",
@@ -29,6 +29,7 @@
     "request": "^2.67.0"
   },
   "devDependencies": {
-    "chai": "^3.4.1"
+    "chai": "^3.4.1",
+    "mongo-express": "^0.29.15"
   }
 }

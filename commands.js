@@ -99,7 +99,9 @@ var commands = {
       cooldown: 600,
       help: 'what a selky is',
       script: function(bot, message, args) {
-        bot.sendMessage(message.channel, 'Giant');
+        bot.sendMessage(message.channel, 'Is quiet and oblivious, and sometimes very hilarious without even trying to be. ' +
+          'She hates being seen as cute and enjoy watching other people cry, for science of course. ' +
+          "She's very hard working when it comes to the things she's passionate about.");
       },
     },
     invite: {
