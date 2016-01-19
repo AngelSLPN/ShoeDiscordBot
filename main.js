@@ -4,6 +4,9 @@ var Discord = require('discord.js'),
     settings = require('./settings.json'),
     db = require('./db');
 
+//start web server
+require('./web-server');
+
 var mybot = new Discord.Client();
 
 //when the bot is ready
