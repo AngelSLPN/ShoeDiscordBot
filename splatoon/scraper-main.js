@@ -1,5 +1,6 @@
 var request = require('request').defaults({jar: true}),
-    //cheerio = require('cheerio'),
+    scheduler = require('node-schedule'),
+    async = require('async'),
     credentials = require('../auth.json'),
     ScheduleEntry = require('./schedule-entry-model');
 
@@ -8,6 +9,7 @@ var fs = require('fs');
 
 function SplatnetScraper() {
   this.schedule = [];
+  this.getSchedule();
 }
 
 SplatnetScraper.prototype.login = function(callback) {
@@ -31,10 +33,26 @@ SplatnetScraper.prototype.login = function(callback) {
 
 SplatnetScraper.prototype.getSchedule = function(callback) {
   if (this.scheduleValid(Date.now())) {
+    if (callback) {
+      callback(null, this.getScheduleAsMessage(this.schedule));
+    }
+    //callback?callback(null, this.getScheduleAsMessage(this.schedule)):null;
+  } else {
+    async.series(
+      [
+        this.login,
+        this.pollSchedule.bind(this),
+      ],
+      function(err, results) {
+        callback?callback(err, results[1]):null;
+      }
+    );
+  }
+  /*if (this.scheduleValid()) {
     callback(null, this.getScheduleAsMessage(this.schedule));
   } else {
-    this.pollSchedule(callback);
-  }
+    ;
+  }*/
 };
 
 SplatnetScraper.prototype.scheduleValid = function(currentTime) {
@@ -67,23 +85,32 @@ SplatnetScraper.prototype.poll = function(options) {
 };
 
 SplatnetScraper.prototype.pollSchedule = function(callback) {
+  var uriJson = 'https://splatoon.nintendo.net/schedule/index.json?locale=en'
   this.poll({
     uriHtml: 'https://splatoon.nintendo.net/schedule',
-    uriJson: 'https://splatoon.nintendo.net/schedule/index.json?locale=en',
+    uriJson: uriJson,
     callback: callback,
     parseFunction: function(body) {
       var rawSchedule = JSON.parse(body);
       if (rawSchedule.error) {
-        console.error('get ' + urijson + ' failed');
+        console.error('get ' + uriJson + ' failed: ' + rawSchedule.error);
         return;
       }
 
       var jsonSchedule = this.parseScheduleJson(rawSchedule);
       this.schedule = jsonSchedule;
       this.saveScheduleToDb(jsonSchedule);
+      this.scheduleNextUpdate(jsonSchedule);
+      console.log('updated splatnet schedule at ' + new Date());
       return this.getScheduleAsMessage(jsonSchedule);
     }.bind(this),
   });
+};
+
+SplatnetScraper.prototype.scheduleNextUpdate = function(jsonSchedule) {
+  //update time 5 minutes after schedule is done to give buffer for time differences
+  var date = new Date(jsonSchedule[0].end.getTime() + 3*60000);
+  var j = scheduler.scheduleJob(date, this.getSchedule.bind(this));
 };
 
 SplatnetScraper.prototype.saveScheduleToDb = function(schedule) {

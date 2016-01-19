@@ -62,23 +62,9 @@ var commands = {
       cooldown: 600,
       help: 'upcoming map rotations in splatoon',
       script: function(bot, message, args) {
-        var functions = [];
-        if (splatnet.scheduleValid()) {
-          functions = [splatnet.getSchedule.bind(splatnet)];
-        } else {
-          functions = [
-            splatnet.login,
-            splatnet.getSchedule.bind(splatnet)
-          ];
-        }
-        async.series(
-          functions,
-          function(err, results) {
-            if (results) {
-              bot.sendMessage(message.channel, results[1]);
-            }
-          }
-        );
+        splatnet.getSchedule(function(err, newMess) {
+          bot.sendMessage(message.channel, newMess);
+        });
       },
     },
     ranked: {
