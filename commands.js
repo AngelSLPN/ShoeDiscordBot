@@ -67,20 +67,6 @@ var commands = {
         });
       },
     },
-    ranked: {
-      cooldown: 600,
-      help: 'test command to get ranks',
-      script: function(bot, message, args) {
-        async.series([
-          splatnet.login,
-          splatnet.getRanked.bind(splatnet),
-        ], function(err, results) {
-          /*if (results) {
-            mybot.sendMessage(message.channel, results[1]);
-          }*/
-        });
-      },
-    },
     selky: {
       cooldown: 600,
       help: 'what a selky is',
@@ -103,6 +89,14 @@ var commands = {
           }
         });
       }
+    },
+    permit: {
+      cooldown: 600,
+      help: 'permit bot to speak in this channel',
+      script: function(bot, message, args) {
+        //check if owner
+        //add channel and server to permitted channels list
+      },
     }
   },
   parse: function parseCommand(messageContent) {
