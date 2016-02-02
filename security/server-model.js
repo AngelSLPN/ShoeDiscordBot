@@ -1,14 +1,15 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var ServerSchema = new Schema({
-  begin: Date,
-  end: Date,
-  turfMaps: [String],
-  rankedMode: String,
-  rankedMaps: [String],
+var PermittedChannelSchema = new Schema({
+  name: String,
+  id: String,
+  serverName: String,
+  serverId: String,
+  allPermitted: Boolean,
+  permittedCommands: [String],
 });
 
-var ScheduleEntryModel = mongoose.model('schedule-entry', ScheduleEntrySchema);
+var PermittedChannelModel = mongoose.model('permitted-channel', PermittedChannelSchema);
 
-module.exports = ScheduleEntryModel;
+module.exports = PermittedChannelModel;

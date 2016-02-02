@@ -1,5 +1,6 @@
 var SplatnetScraper = require('./splatoon/scraper-main'),
-    async = require('async');
+    async = require('async'),
+    Permit = require('./security/permit');
 var splatnet = new SplatnetScraper();
 
 var server = {
@@ -12,12 +13,50 @@ var server = {
   },
   owner: {
     cooldown: 600,
-    help: '',
+    help: 'the name of the owner of the server',
     script: function(bot, message, args) {
-      bot.sendMessage(message.channel, message.channel.server.owner);
+      bot.sendMessage(message.channel, message.channel.server.owner.name);
+    },
+  },
+  info: {
+    cooldown: 600,
+    help: 'some server stats',
+    script: function(bot, message, args) {
+      var server = message.channel.server;
+      var info = '';
+      info += '__**' + server.name + '**__\n';
+      info += 'id: ' + server.id + '\n';
+      info += 'members: ' + server.members.length + '\n';
+      info += 'channels: ' + server.channels.length + '\n';
+      info += 'region: ' + server.region + '\n';
+      info += 'icon: ' + server.iconURL + '\n';
+
+      bot.sendMessage(message.channel, info);
     },
   },
 };
+
+var channel = {
+  default: {
+    cooldwon: 600,
+    help: '',
+    script: function(bot, message, args) {
+      bot.sendMessage(message.channel, 'channel default stub function');
+    },
+  },
+  info: {
+    cooldown: 600,
+    help: '',
+    script: function(bot, message, args) {
+      var channel = message.channel;
+      var info = '';
+      info += '__**' + channel.name + '**__\n';
+      info += 'id: ' + channel.id + '\n';
+
+      bot.sendMessage(message.channel, info);
+    },
+  },
+}
 
 var commands = {
   list: {
@@ -48,6 +87,17 @@ var commands = {
           server[args[0]].script(bot, message, args);
         } else {
           server.default.script(bot, message, args);
+        }
+      },
+    },
+    channel: {
+      cooldown: 600,
+      help: 'server specific commands',
+      script: function(bot, message, args) {
+        if (args[0]) {
+          channel[args[0]].script(bot, message, args);
+        } else {
+          channel.default.script(bot, message, args);
         }
       },
     },
@@ -90,15 +140,21 @@ var commands = {
         });
       }
     },
+
     permit: {
       cooldown: 600,
       help: 'permit bot to speak in this channel',
-      script: function(bot, message, args) {
-        //check if owner
-        //add channel and server to permitted channels list
-      },
-    }
+      userGroups: ['owner', 'creator'],
+      script: Permit.permit,
+    },
+    mute: {
+      cooldown: 600,
+      help: 'prevent bot from speaking in this channel',
+      userGroups: ['owner', 'creator'],
+      script: Permit.mute,
+    },
   },
+  
   parse: function parseCommand(messageContent) {
     var args = messageContent.slice(1).split(' ');
     return {

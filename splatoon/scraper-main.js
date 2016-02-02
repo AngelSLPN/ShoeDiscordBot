@@ -36,7 +36,6 @@ SplatnetScraper.prototype.getSchedule = function(callback) {
     if (callback) {
       callback(null, this.getScheduleAsMessage(this.schedule));
     }
-    //callback?callback(null, this.getScheduleAsMessage(this.schedule)):null;
   } else {
     async.series(
       [
@@ -48,11 +47,6 @@ SplatnetScraper.prototype.getSchedule = function(callback) {
       }
     );
   }
-  /*if (this.scheduleValid()) {
-    callback(null, this.getScheduleAsMessage(this.schedule));
-  } else {
-    ;
-  }*/
 };
 
 SplatnetScraper.prototype.scheduleValid = function(currentTime) {
@@ -117,17 +111,17 @@ SplatnetScraper.prototype.saveScheduleToDb = function(schedule) {
   for (var i=0; i < schedule.length; i++) {
     ScheduleEntry.findOne({'begin': schedule[i].begin})
     .select('begin end')
-    .exec(function(err, doc) {
+    .exec(function(schedule, err, doc) {
       if (err) {
         return console.log(err);
       }
       if (!doc) {
-        var model = new ScheduleEntry(this);
+        var model = new ScheduleEntry(schedule);
         model.save(function(err, entry) {
           if (err) return console.error(err);
         });
       }
-    }.bind(schedule[i]));
+    }.bind(null, schedule[i]));
   }
 };
 
