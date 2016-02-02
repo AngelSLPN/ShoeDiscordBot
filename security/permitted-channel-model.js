@@ -8,6 +8,7 @@ var PermittedChannelSchema = new Schema({
   serverId: String,
   allPermitted: Boolean,
   permittedCommands: [String],
+  forbiddenCommands: [String],
 });
 
 var PermittedChannelModel = mongoose.model('permitted-channel', PermittedChannelSchema);

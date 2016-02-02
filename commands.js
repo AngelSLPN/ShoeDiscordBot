@@ -147,14 +147,14 @@ var commands = {
       userGroups: ['owner', 'creator'],
       script: Permit.permit,
     },
-    mute: {
+    forbid: {
       cooldown: 600,
       help: 'prevent bot from speaking in this channel',
       userGroups: ['owner', 'creator'],
-      script: Permit.mute,
+      script: Permit.forbid,
     },
   },
-  
+
   parse: function parseCommand(messageContent) {
     var args = messageContent.slice(1).split(' ');
     return {

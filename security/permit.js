@@ -1,4 +1,4 @@
-var PermittedChannels = require('./server-model');
+var PermittedChannels = require('./permitted-channel-model');
 
 Permit = {
   permit: function permit(bot, message, args) {
@@ -16,36 +16,46 @@ Permit = {
           serverName: message.channel.server.name,
           serverId: message.channel.server.id,
           allPermitted: true,
-          permittedCommands: ['all'],
+          permittedCommands: [],
+          forbiddenCommands: [],
         };
         var model = new PermittedChannels(channel);
         model.save(function(err, entry) {
           if (err) return console.error(err);
         });
       } else {
+        doc.allPermitted = true;
+        doc.save();
         //change permission on channel to all
       }
     });
   },
 
   //mute the bot in the channel the command was executed in
-  mute: function mute(bot, message, args) {
+  forbid: function forbid(bot, message, args) {
     PermittedChannels.findOne({ id: message.channel.id }, function (err, doc) {
       doc.allPermitted = false;
       doc.save();
     });
-
   },
 
-  checkPermit: function(channel, command, callback) {
-    PermittedChannels.findOne({id: channel.id}, function(err, doc) {
+  checkPermit: function(message, command, callback) {
+    //bot is always permitted to speak in private channels
+    if (message.channel.isPrivate) {
+      callback(null, true);
+      return;
+    }
+
+    PermittedChannels.findOne({id: message.channel.id}, function(err, doc) {
       if (err) {
         callback(err, false);
         console.log(err);
         return;
       }
 
-      if (!doc) {
+      if (command == 'permit' && message.channel.server.owner.id == message.author.id) {
+        callback(null, true);
+      } else if (!doc) {
         callback(null, false);
       } else if (doc.forbiddenCommands.indexOf(command) > -1) {
         callback(null, false);

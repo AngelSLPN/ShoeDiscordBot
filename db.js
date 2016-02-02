@@ -25,3 +25,4 @@ process.on('SIGINT', function() {
 
 // Schemas & Models
 require('./splatoon/schedule-entry-model');
+require('./security/permitted-channel-model');
