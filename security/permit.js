@@ -1,12 +1,4 @@
-var PermittedChannels = require('./permitted-channel-model'),
-    commands = require('../commands');
-
-function userPermitted(command) {
-  if (commands[command].userGroups) {
-    
-  }
-  //loop through command user groups
-}
+var PermittedChannels = require('./permitted-channel-model');
 
 Permit = {
   permit: function permit(bot, message, args) {
@@ -44,37 +36,6 @@ Permit = {
     PermittedChannels.findOne({ id: message.channel.id }, function (err, doc) {
       doc.allPermitted = false;
       doc.save();
-    });
-  },
-
-  checkPermit: function(message, command, callback) {
-    //bot is always permitted to speak in private channels
-    if (message.channel.isPrivate) {
-      callback(null, true);
-      return;
-    }
-
-    PermittedChannels.findOne({id: message.channel.id}, function(err, doc) {
-      if (err) {
-        callback(err, false);
-        console.log(err);
-        return;
-      }
-
-      //always allow the owner permission to permit bot to talk
-      if (command == 'permit' && message.channel.server.owner.id == message.author.id) {
-        callback(null, true);
-      } else if (!doc) {
-        callback(null, false);
-      } else if (doc.forbiddenCommands.indexOf(command) > -1) {
-        callback(null, false);
-      } else if (doc.allPermitted) {
-        callback(null, true);
-      } else if (doc.permittedCommands.indexOf(command) > -1) {
-        callback(null, true);
-      } else {
-        callback(null, false);
-      }
     });
   },
 }

@@ -2,7 +2,7 @@ var Discord = require('discord.js'),
     auth = require('./auth.json'),
     commands = require('./commands'),
     settings = require('./settings.json'),
-    Permit = require('./security/permit'),
+    checkPermit = require('./security/check-permit'),
     db = require('./db');
 
 //start web server
@@ -28,7 +28,7 @@ mybot.on('message', function(message) {
   if (message.content.startsWith(settings.prefix)) {
     var parsed = commands.parse(message.content);
     if (commands.list.hasOwnProperty(parsed.command)) {
-      Permit.checkPermit(message, parsed.command, function(err, permitted) {
+      checkPermit(message, parsed.command, function(err, permitted) {
         if (permitted) {
           commands.list[parsed.command].script(mybot, message, parsed.arguments);
         }
