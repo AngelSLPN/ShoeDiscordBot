@@ -1,4 +1,12 @@
-var PermittedChannels = require('./permitted-channel-model');
+var PermittedChannels = require('./permitted-channel-model'),
+    commands = require('../commands');
+
+function userPermitted(command) {
+  if (commands[command].userGroups) {
+    
+  }
+  //loop through command user groups
+}
 
 Permit = {
   permit: function permit(bot, message, args) {
@@ -53,6 +61,7 @@ Permit = {
         return;
       }
 
+      //always allow the owner permission to permit bot to talk
       if (command == 'permit' && message.channel.server.owner.id == message.author.id) {
         callback(null, true);
       } else if (!doc) {

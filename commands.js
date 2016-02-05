@@ -34,7 +34,81 @@ var server = {
       bot.sendMessage(message.channel, info);
     },
   },
+
+  channels: {
+    cooldown: 600,
+    help: 'list of channels',
+    script: function(bot, message, args) {
+      var textChannels = [],
+          voiceChannels = [];
+
+      message.channel.server.channels.map(function(channel) {
+        if (channel.type == 'voice') {
+          voiceChannels.push(channel);
+        } else if (channel.type == 'text') {
+          textChannels.push(channel);
+        }
+      });
+
+      var channels = '';
+      channels += '__**Text**__\n';
+      textChannels.map(function(channel) {
+        channels += channel.toString() + '\n';
+      });
+
+      channels += '\n__**Voice**__\n';
+      voiceChannels.map(function(channel) {
+        channels += channel.mention() + '\n';
+      });
+
+      bot.sendMessage(message.channel, channels);
+    },
+  },
 };
+
+var user = {
+  default: {
+    cooldown: 600,
+    help: '',
+    script: function(bot, message, args) {
+
+    },
+  },
+
+  info: {
+    cooldown: 600,
+    help: '',
+    script: function(bot, message, args) {
+      var user = message.author;
+
+      var info = '';
+      info += '__**' + user.username + '**__\n';
+      info += 'discriminator: ' + user.discriminator + '\n';
+      info += 'id: ' + user.id + '\n';
+      info += 'status: ' + user.status + '\n';
+      info += 'avatarURL: ' + user.avatarURL + '\n';
+
+      if (message.channel.server) {
+        var details = message.channel.server.detailsOfUser(user);
+        var rolesText = '';
+        if (details.roles.length > 0) {
+          details.roles.map(function(role) {
+            rolesText += role.name + ', ';
+          });
+          rolesText = rolesText.slice(0, -2);
+        } else {
+          rolesText += 'none';
+        }
+
+        info += 'roles: ' +  rolesText + '\n';
+
+        info += 'joined server: ' + (new Date(details.joinedAt)).toString();
+      }
+
+      bot.sendMessage(message.channel, info);
+    },
+  },
+}
 
 var channel = {
   default: {
@@ -72,6 +146,23 @@ var commands = {
         }
       },
     },
+
+    user: {
+      cooldown: 600,
+      help: 'user commands',
+      script: function(bot, message, args) {
+        if (args[0]) {
+          if (user[args[0]]) {
+            user[args[0]].script(bot, message, args);
+          } else {
+            bot.sendMessage(message.channel, 'there is no user command: ' + args[0]);
+          }
+        } else {
+          user.default.script(bot, message, args);
+        }
+      },
+    },
+
     servers: {
       cooldown: 600,
       help: 'a list of servers this bot is in',
@@ -79,6 +170,7 @@ var commands = {
         bot.sendMessage(message.channel, bot.servers);
       },
     },
+
     server: {
       cooldown: 600,
       help: 'server specific commands',
@@ -90,6 +182,7 @@ var commands = {
         }
       },
     },
+
     channel: {
       cooldown: 600,
       help: 'server specific commands',
@@ -147,6 +240,7 @@ var commands = {
       userGroups: ['owner', 'creator'],
       script: Permit.permit,
     },
+
     forbid: {
       cooldown: 600,
       help: 'prevent bot from speaking in this channel',
