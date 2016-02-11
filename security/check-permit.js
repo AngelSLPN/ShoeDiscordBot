@@ -9,8 +9,7 @@ function userPermitted(message, command) {
       if (message.channel.isPrivate) {
         return group == 'PM';
       } else if (group == 'creator') {
-        console.log('creator');
-        return message.author.id = settings.creator;
+        return message.author.id == settings.creator;
       } else if (group == 'owner') {
         return message.channel.server.owner.id == message.author.id;
       } else {
