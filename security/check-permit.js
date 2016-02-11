@@ -8,10 +8,11 @@ function userPermitted(message, command) {
     var permissions = commands.list[command].userGroups.map(function(group) {
       if (message.channel.isPrivate) {
         return group == 'PM';
+      } else if (group == 'creator') {
+        console.log('creator');
+        return message.author.id = settings.creator;
       } else if (group == 'owner') {
         return message.channel.server.owner.id == message.author.id;
-      } else if (group == 'creator') {
-        return message.author.id = settings.creator;
       } else {
         return message.channel.server.rolesOfUser(message.author).indexOf(group) > -1;
       }
