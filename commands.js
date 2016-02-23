@@ -3,6 +3,12 @@ var SplatnetScraper = require('./splatoon/scraper-main'),
     Permit = require('./security/permit');
 var splatnet = new SplatnetScraper();
 
+var command = {
+  hasArgs: function(args) {
+    return args.length > 0;
+  },
+};
+
 var server = {
   default: {
     cooldown: 600,
@@ -11,6 +17,7 @@ var server = {
       bot.sendMessage(message.channel, 'server.default stub');
     },
   },
+
   owner: {
     cooldown: 600,
     help: 'the name of the owner of the server',
@@ -18,11 +25,28 @@ var server = {
       bot.sendMessage(message.channel, message.channel.server.owner.name);
     },
   },
+
   info: {
     cooldown: 600,
     help: 'some server stats',
     script: function(bot, message, args) {
-      var server = message.channel.server;
+      var serverObj;
+      if (command.hasArgs(args)) {
+        serverName = args.join(' ');
+        servers = message.client.servers.getAll('name', serverName);
+        if (servers.length < 1) {
+          bot.sendMessage(message.channel, serverName + ' not found');
+          return;
+        }
+        serverObj = servers[0];
+      } else {
+        serverObj = message.channel.server;
+      }
+
+      bot.sendMessage(message.channel, server.info.getText(serverObj));
+    },
+
+    getText: function(server) {
       var info = '';
       info += '__**' + server.name + '**__\n';
       info += 'id: ' + server.id + '\n';
@@ -31,8 +55,8 @@ var server = {
       info += 'region: ' + server.region + '\n';
       info += 'icon: ' + server.iconURL + '\n';
 
-      bot.sendMessage(message.channel, info);
-    },
+      return info;
+    }
   },
 
   channels: {
@@ -79,8 +103,28 @@ var user = {
     cooldown: 600,
     help: '',
     script: function(bot, message, args) {
-      var user = message.author;
+      var userObj;
+      var text;
+      if (command.hasArgs(args)) {
+        var username = args.join(' ');
+        users = message.client.users.getAll('username', username);
+        if (users.length < 1) {
+          bot.sendMessage(message.channel, 'user not found');
+          return;
+        }
+        var texts = users.map(function(use) {
+          return user.info.getText(message, use);
+        });
+        text = texts.join('\n');
+      } else {
+        userObj = message.author;
+        text = user.info.getText(message, userObj)
+      }
 
+      bot.sendMessage(message.channel, text);
+    },
+
+    getText: function(message, user) {
       var info = '';
       info += '__**' + user.username + '**__\n';
       info += 'discriminator: ' + user.discriminator + '\n';
@@ -90,22 +134,23 @@ var user = {
 
       if (message.channel.server) {
         var details = message.channel.server.detailsOfUser(user);
-        var rolesText = '';
-        if (details.roles.length > 0) {
-          details.roles.map(function(role) {
-            rolesText += role.name + ', ';
-          });
-          rolesText = rolesText.slice(0, -2);
-        } else {
-          rolesText += 'none';
+        if (details) {
+          var rolesText = '';
+          if (details.roles.length > 0) {
+            details.roles.map(function(role) {
+              rolesText += role.name + ', ';
+            });
+            rolesText = rolesText.slice(0, -2);
+          } else {
+            rolesText += 'none';
+          }
+
+          info += 'roles: ' +  rolesText + '\n';
+
+          info += 'joined server: ' + (new Date(details.joinedAt)).toString();
         }
-
-        info += 'roles: ' +  rolesText + '\n';
-
-        info += 'joined server: ' + (new Date(details.joinedAt)).toString();
       }
-
-      bot.sendMessage(message.channel, info);
+      return info;
     },
   },
 }
@@ -153,7 +198,7 @@ var commands = {
       script: function(bot, message, args) {
         if (args[0]) {
           if (user[args[0]]) {
-            user[args[0]].script(bot, message, args);
+            user[args[0]].script(bot, message, args.slice(1));
           } else {
             bot.sendMessage(message.channel, 'there is no user command: ' + args[0]);
           }
@@ -176,7 +221,11 @@ var commands = {
       help: 'server specific commands',
       script: function(bot, message, args) {
         if (args[0]) {
-          server[args[0]].script(bot, message, args);
+          if (server[args[0]]) {
+            server[args[0]].script(bot, message, args.slice(1));
+          } else {
+            bot.sendMessage(message.channel, 'command not supported');
+          }
         } else {
           server.default.script(bot, message, args);
         }
