@@ -1,163 +1,16 @@
 var SplatnetScraper = require('./splatoon/scraper-main'),
     async = require('async'),
-    Permit = require('./security/permit');
+    Permit = require('./security/permit'),
+    server = require('./info/server'),
+    user = require('./info/user'),
+    music = require('./music/commands'),
+    command = require('./command-utilities');
+
 var splatnet = new SplatnetScraper();
-
-var command = {
-  hasArgs: function(args) {
-    return args.length > 0;
-  },
-};
-
-var server = {
-  default: {
-    cooldown: 600,
-    help: '',
-    script: function(bot, message, args) {
-      bot.sendMessage(message.channel, 'server.default stub');
-    },
-  },
-
-  owner: {
-    cooldown: 600,
-    help: 'the name of the owner of the server',
-    script: function(bot, message, args) {
-      bot.sendMessage(message.channel, message.channel.server.owner.name);
-    },
-  },
-
-  info: {
-    cooldown: 600,
-    help: 'some server stats',
-    script: function(bot, message, args) {
-      var serverObj;
-      if (command.hasArgs(args)) {
-        serverName = args.join(' ');
-        servers = message.client.servers.getAll('name', serverName);
-        if (servers.length < 1) {
-          bot.sendMessage(message.channel, serverName + ' not found');
-          return;
-        }
-        serverObj = servers[0];
-      } else {
-        serverObj = message.channel.server;
-      }
-
-      bot.sendMessage(message.channel, server.info.getText(serverObj));
-    },
-
-    getText: function(server) {
-      var info = '';
-      info += '__**' + server.name + '**__\n';
-      info += 'id: ' + server.id + '\n';
-      info += 'members: ' + server.members.length + '\n';
-      info += 'channels: ' + server.channels.length + '\n';
-      info += 'region: ' + server.region + '\n';
-      info += 'icon: ' + server.iconURL + '\n';
-
-      return info;
-    }
-  },
-
-  channels: {
-    cooldown: 600,
-    help: 'list of channels',
-    script: function(bot, message, args) {
-      var textChannels = [],
-          voiceChannels = [];
-
-      message.channel.server.channels.map(function(channel) {
-        if (channel.type == 'voice') {
-          voiceChannels.push(channel);
-        } else if (channel.type == 'text') {
-          textChannels.push(channel);
-        }
-      });
-
-      var channels = '';
-      channels += '__**Text**__\n';
-      textChannels.map(function(channel) {
-        channels += channel.toString() + '\n';
-      });
-
-      channels += '\n__**Voice**__\n';
-      voiceChannels.map(function(channel) {
-        channels += channel.mention() + '\n';
-      });
-
-      bot.sendMessage(message.channel, channels);
-    },
-  },
-};
-
-var user = {
-  default: {
-    cooldown: 600,
-    help: '',
-    script: function(bot, message, args) {
-
-    },
-  },
-
-  info: {
-    cooldown: 600,
-    help: '',
-    script: function(bot, message, args) {
-      var userObj;
-      var text;
-      if (command.hasArgs(args)) {
-        var username = args.join(' ');
-        users = message.client.users.getAll('username', username);
-        if (users.length < 1) {
-          bot.sendMessage(message.channel, 'user not found');
-          return;
-        }
-        var texts = users.map(function(use) {
-          return user.info.getText(message, use);
-        });
-        text = texts.join('\n');
-      } else {
-        userObj = message.author;
-        text = user.info.getText(message, userObj)
-      }
-
-      bot.sendMessage(message.channel, text);
-    },
-
-    getText: function(message, user) {
-      var info = '';
-      info += '__**' + user.username + '**__\n';
-      info += 'discriminator: ' + user.discriminator + '\n';
-      info += 'id: ' + user.id + '\n';
-      info += 'status: ' + user.status + '\n';
-      info += 'avatarURL: ' + user.avatarURL + '\n';
-
-      if (message.channel.server) {
-        var details = message.channel.server.detailsOfUser(user);
-        if (details) {
-          var rolesText = '';
-          if (details.roles.length > 0) {
-            details.roles.map(function(role) {
-              rolesText += role.name + ', ';
-            });
-            rolesText = rolesText.slice(0, -2);
-          } else {
-            rolesText += 'none';
-          }
-
-          info += 'roles: ' +  rolesText + '\n';
-
-          info += 'joined server: ' + (new Date(details.joinedAt)).toString();
-        }
-      }
-      return info;
-    },
-  },
-}
 
 var channel = {
   default: {
-    cooldwon: 600,
+    cooldown: 600,
     help: '',
     script: function(bot, message, args) {
       bot.sendMessage(message.channel, 'channel default stub function');
@@ -243,6 +96,7 @@ var commands = {
         }
       },
     },
+
     channels: {
       cooldown: 600,
       help: 'a list of channels this bot is in',
@@ -250,6 +104,7 @@ var commands = {
         bot.sendMessage(message.channel, bot.channels);
       },
     },
+
     schedule: {
       cooldown: 600,
       help: 'upcoming map rotations in splatoon',
@@ -259,6 +114,7 @@ var commands = {
         });
       },
     },
+
     selky: {
       cooldown: 600,
       help: 'what a selky is',
@@ -268,6 +124,7 @@ var commands = {
           "She's very hard working when it comes to the things she's passionate about.");
       },
     },
+
     invite: {
       cooldown: 600,
       help: 'make the bot join another discord server',
@@ -296,6 +153,12 @@ var commands = {
       userGroups: ['owner', 'creator'],
       script: Permit.forbid,
     },
+
+    music: {
+      cooldown: 600,
+      help: 'bot plays music',
+      script: command.useNested(music),
+    }
   },
 
   parse: function parseCommand(messageContent) {
