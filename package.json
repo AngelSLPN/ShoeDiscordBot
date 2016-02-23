@@ -28,7 +28,8 @@
     "mongodb": "^2.1.4",
     "mongoose": "^4.3.5",
     "node-schedule": "^0.6.0",
-    "request": "^2.67.0"
+    "request": "^2.67.0",
+    "ytdl-core": "^0.7.10"
   },
   "devDependencies": {
     "chai": "^3.4.1",

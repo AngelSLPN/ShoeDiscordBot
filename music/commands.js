@@ -1,4 +1,5 @@
-var command = require('../command-utilities');
+var command = require('../command-utilities'),
+    ytdl = require('ytdl-core');
 
 var music = {
   default: {
@@ -40,6 +41,48 @@ var music = {
           console.log(err);
         }
       });
+    },
+  },
+
+  youtube: {
+    cooldown: 600,
+    help: 'play a youtube link',
+    script: function(bot, message, args) {
+      var video = ytdl(
+        'http://www.youtube.com/watch?v=oaxUPPdXkaI',
+        {
+          filter: 'audioonly',
+          quality: 'lowest',
+        }
+      );
+
+      video.on('response', function() {
+        /*if (err) {
+          console.log(err);
+          return;
+        }*/
+        console.log('response');
+      });
+
+      video.on('error', function() {
+        console.log('error');
+      });
+
+      bot.voiceConnection.playRawStream(
+        video,
+        {
+          volume: 0.25
+        },
+        function(err, intent) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          console.log('started');
+          intent.on('end', function() {console.log('end')});
+        }
+      );
+      console.log('youtube');
     },
   },
 };
