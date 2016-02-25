@@ -1,5 +1,9 @@
 var command = require('../command-utilities'),
-    ytdl = require('ytdl-core');
+    ytdl = require('ytdl-core'),
+    youtube = require('./youtube'),
+    Queue = require('./queue');
+
+var queue;
 
 var music = {
   default: {
@@ -27,6 +31,7 @@ var music = {
             console.log(err);
             return;
           }
+          queue = new Queue(connection);
         });
       }
     },
@@ -48,43 +53,47 @@ var music = {
     cooldown: 600,
     help: 'play a youtube link',
     script: function(bot, message, args) {
-      var video = ytdl(
-        'http://www.youtube.com/watch?v=oaxUPPdXkaI',
-        {
-          filter: 'audioonly',
-          quality: 'lowest',
-        }
-      );
-
-      video.on('response', function() {
-        /*if (err) {
-          console.log(err);
-          return;
-        }*/
-        console.log('response');
+      if (!command.hasArgs(args)) {
+        return;
+      }
+      youtube(args[0], function(err, song) {
+        queue.addSong(song);
       });
-
-      video.on('error', function() {
-        console.log('error');
-      });
-
-      bot.voiceConnection.playRawStream(
-        video,
-        {
-          volume: 0.25
-        },
-        function(err, intent) {
-          if (err) {
-            console.log(err);
-            return;
-          }
-          console.log('started');
-          intent.on('end', function() {console.log('end')});
-        }
-      );
-      console.log('youtube');
     },
   },
+
+  skip: {
+    cooldown: 0,
+    help: 'skip current song',
+    script: function(bot, message, args) {
+      queue.skip();
+    },
+  },
+
+  stop: {
+    cooldown: 0,
+    help: 'stop playing and empty queue',
+    script: function(bot, message, args) {
+      queue.stop();
+    },
+  },
+
+  pause: {
+    cooldown: 0,
+    help: 'pause playing',
+    script: function(bot, message, args) {
+      queue.stop();
+    },
+  },
+
+  list: {
+    cooldown: 0,
+    help: 'list songs in queue',
+    script: function(bot, message, args) {
+      var list = queue.list();
+      bot.sendMessage(message.channel, list);
+    }
+  }
 };
 
 module.exports = music;
