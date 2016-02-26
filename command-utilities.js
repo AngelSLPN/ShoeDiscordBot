@@ -1,4 +1,9 @@
 var command = {
+  argIsUrl: function(arg) {
+    var re = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+    return re.test(arg);
+  },
+
   hasArgs: function(args) {
     return args.length > 0;
   },

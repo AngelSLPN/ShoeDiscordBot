@@ -170,4 +170,7 @@ var commands = {
   },
 };
 
+//create an alias
+commands.list['dj'] = commands.list.music;
+
 module.exports = commands;

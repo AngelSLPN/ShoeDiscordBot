@@ -16,6 +16,7 @@ Queue.prototype.addSong = function(song) {
   console.log('queued ' + song.title);
   this.queue.push(song);
   this.emit('changed');
+  return this.queue.length;
 };
 
 Queue.prototype.checkChanged = function() {
@@ -61,7 +62,7 @@ Queue.prototype.playNext = function() {
 };
 
 Queue.prototype.play = function() {
-  
+  this.playNext();
 };
 
 Queue.prototype.skip = function() {

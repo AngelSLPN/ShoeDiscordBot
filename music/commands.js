@@ -16,24 +16,31 @@ var music = {
 
   join: {
     cooldown: 600,
-    help: 'join a voice channel',
+    help: 'join a voice channel, if no channel is specified join the first channel',
     script: function(bot, message, args) {
+      var channel;
       if (command.hasArgs(args)) {
         var channelName = args.join(' ');
-        var channel = message.channel.server.channels.get('name', args[0]);
+        channel = message.channel.server.channels.get('name', args[0]);
         if (!channel) {
-          bot.sendMessage(message.channel, 'channel not found');
+          bot.sendMessage(message.channel, args[0] + ' channel not found');
           return;
         }
-
-        bot.joinVoiceChannel(channel, function(err, connection) {
-          if (err) {
-            console.log(err);
-            return;
-          }
-          queue = new Queue(connection);
-        });
+      } else {
+        channel = message.channel.server.channels.get('type', 'voice');
+        if (!channel) {
+          bot.sendMessage(message.channel, 'no voice channels found');
+          return;
+        }
       }
+
+      bot.joinVoiceChannel(channel, function(err, connection) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        queue = new Queue(connection);
+      });
     },
   },
 
@@ -45,19 +52,67 @@ var music = {
         if (err) {
           console.log(err);
         }
+        queue = null;
       });
     },
   },
 
+  location: {
+    cooldown: 0,
+    help: 'voice channel the dj is in',
+    script: function(bot, message, args) {
+      var mess;
+      if (bot.voiceConnection) {
+        mess = bot.voiceConnection.voiceChannel + ' on ' + bot.voiceConnection.voiceChannel.server
+      } else {
+        mess = 'bot is currently not in a channel';
+      }
+      bot.sendMessage(message.channel, mess);
+    }
+  },
+
   youtube: {
     cooldown: 600,
-    help: 'play a youtube link',
+    help: 'play a youtube link, if the link is not a url search on youtube and queue first song',
     script: function(bot, message, args) {
+      if (!queue) {
+        bot.sendMessage(message.channel, 'bot is not in a voice channel');
+        return;
+      }
       if (!command.hasArgs(args)) {
         return;
       }
-      youtube(args[0], function(err, song) {
-        queue.addSong(song);
+      if (command.argIsUrl(args[0])) {
+        if (!youtube.isYtUrl(args[0])) {
+          bot.sendMessage(message.channel, args[0] + ' is not youtube url');
+          return;
+        }
+        youtube.getSong(args[0], function(err, song) {
+          var pos = queue.addSong(song);
+          //delete the command cause youtube previews are huge
+          bot.deleteMessage(message);
+          bot.sendMessage(message.channel, 'queued “' + song.title + '” at #' + pos);
+        });
+      } else {
+        //search on youtube
+        youtube.search(args.join(' ')).then(function(res) {
+          youtube.getSong(res.url, function(err, song) {
+            var pos = queue.addSong(song);
+            bot.sendMessage(message.channel, 'queued “' + res.title + '” at #' + pos);
+          });
+        });
+      }
+    },
+  },
+
+  search: {
+    cooldown: 600,
+    help: 'find a youtube video',
+    script: function(bot, message, args) {
+      //search on youtube
+      youtube.search(args.join(' ')).then(function(res) {
+        var mess = res.title + '\n' + res.url;
+        bot.sendMessage(message.channel, mess);
       });
     },
   },
@@ -95,5 +150,7 @@ var music = {
     }
   }
 };
+
+music['play'] = music.youtube;
 
 module.exports = music;
