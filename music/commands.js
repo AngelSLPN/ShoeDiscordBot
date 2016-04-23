@@ -88,6 +88,11 @@ var music = {
           return;
         }
         youtube.getSong(args[0], function(err, song) {
+          if (err) {
+            console.log(err);
+            bot.sendMessage(message.channel, 'error getting song');
+          }
+
           var pos = queue.addSong(song);
           //delete the command cause youtube previews are huge
           bot.deleteMessage(message);
@@ -97,9 +102,17 @@ var music = {
         //search on youtube
         youtube.search(args.join(' ')).then(function(res) {
           youtube.getSong(res.url, function(err, song) {
+            if (err) {
+              console.log(err);
+              bot.sendMessage(message.channel, 'error getting song');
+            }
+
             var pos = queue.addSong(song);
             bot.sendMessage(message.channel, 'queued “' + res.title + '” at #' + pos);
           });
+        }).catch(function(err) {
+          console.log(err);
+          bot.sendMessage(message.channel, 'error finding song');
         });
       }
     },

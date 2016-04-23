@@ -40,7 +40,7 @@ Queue.prototype.playNext = function() {
     return this.voiceCon.playRawStream(
       stream,
       {
-        volume: 0.25
+        volume: 0.12
       }
     );
   }.bind(this), function (err) {
