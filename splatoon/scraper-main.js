@@ -165,6 +165,7 @@ SplatnetScraper.prototype.getScheduleAsMessage = function(jsonSchedule) {
     if (jsonSchedule[i].splatfestMaps) {
       message += jsonSchedule[i].alpha + ' vs ' + jsonSchedule[i].bravo + ' on ' + jsonSchedule[i].splatfestMaps[0] + ', ';
       message += jsonSchedule[i].splatfestMaps[1] + ', and ' + jsonSchedule[i].splatfestMaps[2];
+      message += '\n**Ends ' + this.getTimeString(jsonSchedule[i].end) + '**';
     }
   }
   return message;

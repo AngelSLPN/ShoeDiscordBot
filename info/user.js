@@ -19,7 +19,7 @@ var user = {
         var username = args.join(' ');
         users = message.client.users.getAll('username', username);
         if (users.length < 1) {
-          bot.sendMessage(message.channel, 'user not found');
+          message.channel.sendMessage('user not found');
           return;
         }
         var texts = users.map(function(use) {
@@ -31,7 +31,7 @@ var user = {
         text = user.info.getText(message, userObj)
       }
 
-      bot.sendMessage(message.channel, text);
+      message.channel.sendMessage(text);
     },
 
     getText: function(message, user) {
@@ -42,8 +42,8 @@ var user = {
       info += 'status: ' + user.status + '\n';
       info += 'avatarURL: ' + user.avatarURL + '\n';
 
-      if (message.channel.server) {
-        var details = message.channel.server.detailsOfUser(user);
+      if (message.channel.guild) {
+        var details = message.channel.guild.detailsOfUser(user);
         if (details) {
           var rolesText = '';
           if (details.roles.length > 0) {

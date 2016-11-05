@@ -12,7 +12,7 @@ var mybot = new Discord.Client();
 
 //when the bot is ready
 mybot.on("ready", function () {
-	console.log("Ready to begin! Serving in " + mybot.channels.length + " channels");
+	console.log("Ready to begin! Serving in " + mybot.channels.array().length + " channels");
 });
 
 //when the bot disconnects
@@ -34,7 +34,7 @@ mybot.on('message', function(message) {
         }
       });
     } else {
-      mybot.sendMessage(message.channel, '"' + parsed.command + '" command not supported');
+      mymessage.channel.sendMessage('"' + parsed.command + '" command not supported');
     }
   }
 });
@@ -43,4 +43,4 @@ mybot.on('serverCreated', function(server) {
   console.log('Joined ' + server.name);
 });
 
-mybot.loginWithToken(auth.discord.token);
+mybot.login(auth.discord.token);

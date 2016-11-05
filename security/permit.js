@@ -10,11 +10,12 @@ Permit = {
       }
       if (!doc) {
         //add channel to db
+        console.log(message);
         var channel = {
           name: message.channel.name,
           id: message.channel.id,
-          serverName: message.channel.server.name,
-          serverId: message.channel.server.id,
+          serverName: message.channel.guild.name,
+          serverId: message.channel.guild.id,
           allPermitted: true,
           permittedCommands: [],
           forbiddenCommands: [],

@@ -5,7 +5,7 @@ var server = {
     cooldown: 600,
     help: '',
     script: function(bot, message, args) {
-      bot.sendMessage(message.channel, 'server.default stub');
+      message.channel.sendMessage('server.default stub');
     },
   },
 
@@ -13,7 +13,7 @@ var server = {
     cooldown: 600,
     help: 'the name of the owner of the server',
     script: function(bot, message, args) {
-      bot.sendMessage(message.channel, message.channel.server.owner.name);
+      message.channel.sendMessage(message.channel.server.owner.name);
     },
   },
 
@@ -26,7 +26,7 @@ var server = {
         serverName = args.join(' ');
         servers = message.client.servers.getAll('name', serverName);
         if (servers.length < 1) {
-          bot.sendMessage(message.channel, serverName + ' not found');
+          message.channel.sendMessage(serverName + ' not found');
           return;
         }
         serverObj = servers[0];
@@ -34,7 +34,7 @@ var server = {
         serverObj = message.channel.server;
       }
 
-      bot.sendMessage(message.channel, server.info.getText(serverObj));
+      message.channel.sendMessage(server.info.getText(serverObj));
     },
 
     getText: function(server) {
@@ -76,7 +76,7 @@ var server = {
         channels += channel.mention() + '\n';
       });
 
-      bot.sendMessage(message.channel, channels);
+      message.channel.sendMessage(channels);
     },
   },
 };

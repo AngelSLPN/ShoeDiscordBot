@@ -14,7 +14,7 @@ var channel = {
     cooldown: 600,
     help: '',
     script: function(bot, message, args) {
-      bot.sendMessage(message.channel, 'channel default stub function');
+      message.channel.sendMessage('channel default stub function');
     },
   },
   info: {
@@ -26,7 +26,7 @@ var channel = {
       info += '__**' + channel.name + '**__\n';
       info += 'id: ' + channel.id + '\n';
 
-      bot.sendMessage(message.channel, info);
+      message.channel.sendMessage(info);
     },
   },
 }
@@ -38,10 +38,10 @@ var commands = {
       help: 'call this command to get help',
       script: function(bot, message, args) {
         if (args[0]) {
-          bot.sendMessage(message.channel, commands.list[args[0]].help);
+          message.channel.sendMessage( commands.list[args[0]].help);
         } else {
           //list commands
-          bot.sendMessage(message.channel, Object.keys(commands.list).toString());
+          message.channel.sendMessage( Object.keys(commands.list).toString());
         }
       },
     },
@@ -54,7 +54,7 @@ var commands = {
           if (user[args[0]]) {
             user[args[0]].script(bot, message, args.slice(1));
           } else {
-            bot.sendMessage(message.channel, 'there is no user command: ' + args[0]);
+            message.channel.sendMessage( 'there is no user command: ' + args[0]);
           }
         } else {
           user.default.script(bot, message, args);
@@ -66,7 +66,7 @@ var commands = {
       cooldown: 600,
       help: 'a list of servers this bot is in',
       script: function(bot, message, args) {
-        bot.sendMessage(message.channel, bot.servers);
+        message.channel.sendMessage( bot.servers);
       },
     },
 
@@ -78,7 +78,7 @@ var commands = {
           if (server[args[0]]) {
             server[args[0]].script(bot, message, args.slice(1));
           } else {
-            bot.sendMessage(message.channel, 'command not supported');
+            message.channel.sendMessage( 'command not supported');
           }
         } else {
           server.default.script(bot, message, args);
@@ -102,7 +102,7 @@ var commands = {
       cooldown: 600,
       help: 'a list of channels this bot is in',
       script: function(bot, message, args) {
-        bot.sendMessage(message.channel, bot.channels);
+        message.channel.sendMessage( message.channels);
       },
     },
 
@@ -111,7 +111,7 @@ var commands = {
       help: 'upcoming map rotations in splatoon',
       script: function(bot, message, args) {
         splatnet.getSchedule(function(err, newMess) {
-          bot.sendMessage(message.channel, newMess);
+          message.channel.sendMessage(newMess);
         });
       },
     },
@@ -120,7 +120,7 @@ var commands = {
       cooldown: 600,
       help: 'what a selky is',
       script: function(bot, message, args) {
-        bot.sendMessage(message.channel, 'Is quiet and oblivious, and sometimes very hilarious without even trying to be. ' +
+        message.channel.sendMessage( 'Is quiet and oblivious, and sometimes very hilarious without even trying to be. ' +
           'She hates being seen as cute and enjoy watching other people cry, for science of course. ' +
           "She's very hard working when it comes to the things she's passionate about.");
       },
@@ -131,7 +131,7 @@ var commands = {
       help: 'make the bot join another discord server',
       script: function(bot, message, args) {
         var invite = "https://discordapp.com/oauth2/authorize?client_id=" + auth.discord.client_id + "&scope=bot&permissions=0"
-        bot.sendMessage(message.channel, invite);
+        message.channel.sendMessage( invite);
       }
     },
 
