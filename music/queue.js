@@ -37,7 +37,7 @@ Queue.prototype.playNext = function() {
   console.log('playing ' + song.title);
   song.getStream().then(function(stream) {
     this.currentStream = stream;
-    return this.voiceCon.playRawStream(
+    return this.voiceCon.playStream(
       stream,
       {
         volume: 0.12

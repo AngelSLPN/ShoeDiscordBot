@@ -21,26 +21,25 @@ var music = {
       var channel;
       if (command.hasArgs(args)) {
         var channelName = args.join(' ');
-        channel = message.channel.server.channels.get('name', args[0]);
+        channel = message.channel.guild.channels.find('name', args[0]);
         if (!channel) {
           message.channel.sendMessage(args[0] + ' channel not found');
           return;
         }
       } else {
-        channel = message.channel.server.channels.get('type', 'voice');
+        channel = message.channel.guild.channels.find('type', 'voice');
         if (!channel) {
           message.channel.sendMessage('no voice channels found');
           return;
         }
       }
 
-      bot.joinVoiceChannel(channel, function(err, connection) {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        queue = new Queue(connection);
-      });
+      channel.join()
+	.then(connection => {
+            queue = new Queue(connection);
+	})
+	.catch(console.log)
+
     },
   },
 
