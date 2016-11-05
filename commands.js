@@ -4,7 +4,8 @@ var SplatnetScraper = require('./splatoon/scraper-main'),
     server = require('./info/server'),
     user = require('./info/user'),
     music = require('./music/commands'),
-    command = require('./command-utilities');
+    command = require('./command-utilities'),
+    auth = require('./auth.json');
 
 var splatnet = new SplatnetScraper();
 
@@ -129,14 +130,8 @@ var commands = {
       cooldown: 600,
       help: 'make the bot join another discord server',
       script: function(bot, message, args) {
-        console.log('got invite to ' + args[0]);
-        bot.joinServer(args[0], function(error, server) {
-          if(error){
-              bot.sendMessage(message.channel, "Failed to join: " + error);
-          } else {
-              bot.sendMessage(message.channel, "Joined " + server);
-          }
-        });
+        var invite = "https://discordapp.com/oauth2/authorize?client_id=" + auth.discord.client_id + "&scope=bot&permissions=0"
+        bot.sendMessage(message.channel, invite);
       }
     },
 

@@ -39,4 +39,8 @@ mybot.on('message', function(message) {
   }
 });
 
-mybot.login(auth.discord.email, auth.discord.password);
+mybot.on('serverCreated', function(server) {
+  console.log('Joined ' + server.name);
+});
+
+mybot.loginWithToken(auth.discord.token);
