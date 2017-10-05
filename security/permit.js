@@ -10,7 +10,6 @@ Permit = {
       }
       if (!doc) {
         //add channel to db
-        console.log(message);
         var channel = {
           name: message.channel.name,
           id: message.channel.id,

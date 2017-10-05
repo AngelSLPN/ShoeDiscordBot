@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-var dbUri = 'mongodb://localhost/ShoeBot';
+var dbUri = 'mongodb://mongo:27017/ShoeBot';
 
 mongoose.connect(dbUri);
 

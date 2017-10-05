@@ -1,5 +1,4 @@
 var command = require('../command-utilities');
-console.log(command);
 var user = {
   default: {
     cooldown: 600,
@@ -43,7 +42,7 @@ var user = {
       info += 'avatarURL: ' + user.avatarURL + '\n';
 
       if (message.channel.guild) {
-        var details = message.channel.guild.detailsOfUser(user);
+        var details = message.channel.guild.fetchMember(user);
         if (details) {
           var rolesText = '';
           if (details.roles.length > 0) {

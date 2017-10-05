@@ -34,7 +34,7 @@ mybot.on('message', function(message) {
         }
       });
     } else {
-      mymessage.channel.sendMessage('"' + parsed.command + '" command not supported');
+      message.channel.sendMessage('"' + parsed.command + '" command not supported');
     }
   }
 });

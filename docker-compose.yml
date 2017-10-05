@@ -1,0 +1,23 @@
+version: "2"
+services:
+    bot:
+        image: myhsu/discord-bot
+        mem_limit: 209715200
+        volumes:
+            - ./:/app
+        ports:
+            - "3000:3000"
+        links:
+            - mongo
+    mongo:
+        image: mongo
+        mem_limit: 50000000
+        ports:
+            - "27017:27017"
+        volumes_from:
+            - mongodata
+    mongodata:
+        image: tianon/true
+        mem_limit: 10000000
+        volumes:
+            - /data/db:/data/db
